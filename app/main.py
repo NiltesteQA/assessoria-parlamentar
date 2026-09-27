@@ -62,9 +62,9 @@ def dashboard(
     config = db.query(Configuracao).first()
 
     return templates.TemplateResponse(
+        request,
         "dashboard.html",
         {
-            "request": request,
             "titulo": "Dashboard",
             "metricas": m,
             "rotulo": rotulo_trimestre(ano, trimestre),

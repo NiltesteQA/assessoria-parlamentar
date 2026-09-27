@@ -43,14 +43,13 @@ def tela_relatorio(
     ctx = _contexto_relatorio(db, ano, trimestre)
     ctx.update(
         {
-            "request": request,
             "titulo": "Relatório Trimestral",
             "anos": anos_disponiveis(db),
             "trimestres": ["Q1", "Q2", "Q3", "Q4"],
             "active": "relatorio",
         }
     )
-    return templates.TemplateResponse("relatorio.html", ctx)
+    return templates.TemplateResponse(request, "relatorio.html", ctx)
 
 
 @router.post("/configuracao/salvar")

@@ -58,9 +58,9 @@ def listar(
     oficios = _filtrar(db, q, status, orgao, data_ini, data_fim)
     orgaos = sorted({o.orgao_destinatario for o in db.query(Oficio).all() if o.orgao_destinatario})
     return templates.TemplateResponse(
+        request,
         "oficios.html",
         {
-            "request": request,
             "titulo": "Ofícios e Ações Oficiais",
             "oficios": oficios,
             "status_opcoes": STATUS_OFICIO,

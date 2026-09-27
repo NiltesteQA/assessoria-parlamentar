@@ -44,9 +44,9 @@ def listar(
     contatos = _filtrar(db, q, bairro, cargo)
     bairros = sorted({c.bairro for c in db.query(Contato).all() if c.bairro})
     return templates.TemplateResponse(
+        request,
         "contatos.html",
         {
-            "request": request,
             "titulo": "Contatos / Redes Políticas",
             "contatos": contatos,
             "cargos": CARGOS,

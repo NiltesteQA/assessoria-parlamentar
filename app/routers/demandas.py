@@ -61,9 +61,9 @@ def listar(
     bairros = sorted({d.bairro for d in db.query(Demanda).all() if d.bairro})
     contatos = db.query(Contato).order_by(Contato.nome_completo).all()
     return templates.TemplateResponse(
+        request,
         "demandas.html",
         {
-            "request": request,
             "titulo": "Atendimentos e Demandas",
             "demandas": demandas,
             "categorias": CATEGORIAS_DEMANDA,
