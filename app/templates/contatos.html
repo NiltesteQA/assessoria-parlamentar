@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+  <div>
+    <h1 class="text-2xl font-bold text-brand-800">Contatos / Redes Políticas</h1>
+    <p class="text-sm text-slate-500">{{ contatos|length }} contato(s)</p>
+  </div>
+  <div class="flex gap-2">
+    <button onclick="openModal('modal-novo-contato')"
+            class="bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-brand-800">
+      + Novo Contato
+    </button>
+  </div>
+</div>
+
+<!-- Filtros -->
+<form method="get" action="/contatos" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-4">
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+    <input name="q" value="{{ filtros.q }}" placeholder="Buscar nome, telefone, notas…"
+           class="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2" />
+    <select name="bairro" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      <option value="">Todos os bairros</option>
+      {% for b in bairros %}<option value="{{ b }}" {{ 'selected' if b == filtros.bairro }}>{{ b }}</option>{% endfor %}
+    </select>
+    <select name="cargo" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      <option value="">Todos os cargos</option>
+      {% for c in cargos %}<option value="{{ c }}" {{ 'selected' if c == filtros.cargo }}>{{ c }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="flex flex-wrap gap-2 mt-3">
+    <button class="bg-slate-800 text-white text-sm px-4 py-2 rounded-lg">Filtrar</button>
+    <a href="/contatos" class="text-sm px-4 py-2 rounded-lg border border-slate-300">Limpar</a>
+    <div class="flex-1"></div>
+    <a href="/contatos/exportar/csv?q={{ filtros.q }}&bairro={{ filtros.bairro }}&cargo={{ filtros.cargo }}"
+       class="text-sm px-4 py-2 rounded-lg border border-emerald-600 text-emerald-700 hover:bg-emerald-50">Exportar CSV</a>
+    <a href="/contatos/exportar/excel?q={{ filtros.q }}&bairro={{ filtros.bairro }}&cargo={{ filtros.cargo }}"
+       class="text-sm px-4 py-2 rounded-lg border border-emerald-600 text-emerald-700 hover:bg-emerald-50">Exportar Excel</a>
+  </div>
+</form>
+
+<!-- Tabela -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+  <div class="overflow-x-auto table-scroll">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="px-4 py-3 font-medium">Nome</th>
+          <th class="px-4 py-3 font-medium">Cargo</th>
+          <th class="px-4 py-3 font-medium">Bairro</th>
+          <th class="px-4 py-3 font-medium">Telefone</th>
+          <th class="px-4 py-3 font-medium">Apoio</th>
+          <th class="px-4 py-3 font-medium text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for c in contatos %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-medium text-slate-800">{{ c.nome_completo }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ c.cargo }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ c.bairro or '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ c.telefone or '—' }}</td>
+          <td class="px-4 py-3">
+            <span class="text-amber-500">{{ '★' * c.nivel_apoio }}</span><span class="text-slate-300">{{ '★' * (5 - c.nivel_apoio) }}</span>
+          </td>
+          <td class="px-4 py-3 text-right whitespace-nowrap">
+            <button onclick='openEditarContato({{ c.to_dict() | tojson }})' class="text-brand-600 hover:underline">Editar</button>
+            <form method="post" action="/contatos/{{ c.id }}/excluir" class="inline" onsubmit="return confirm('Excluir este contato?')">
+              <button class="text-rose-600 hover:underline ml-2">Excluir</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="px-4 py-10 text-center text-slate-400">Nenhum contato encontrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Novo Contato -->
+<div id="modal-novo-contato" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">Novo Contato</h3>
+      <button onclick="closeModal('modal-novo-contato')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" action="/contatos/novo" class="space-y-3">
+      <input name="nome_completo" required placeholder="Nome completo *" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <select name="cargo" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          {% for c in cargos %}<option>{{ c }}</option>{% endfor %}
+        </select>
+        <input name="bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+      </div>
+      <input name="telefone" placeholder="Telefone / WhatsApp" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <input name="data_cadastro" type="date" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <label class="block text-sm text-slate-600">Nível de Apoio (1–5)</label>
+      <input type="range" name="nivel_apoio" min="1" max="5" value="3" class="w-full" />
+      <textarea name="notas" rows="2" placeholder="Notas / histórico" class="w-full rounded-lg border border-slate-300 px-3 py-2.5"></textarea>
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Editar Contato -->
+<div id="modal-editar-contato" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">Editar Contato</h3>
+      <button onclick="closeModal('modal-editar-contato')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" id="form-editar-contato" class="space-y-3">
+      <input name="nome_completo" id="ec-nome" required class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <select name="cargo" id="ec-cargo" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          {% for c in cargos %}<option>{{ c }}</option>{% endfor %}
+        </select>
+        <input name="bairro" id="ec-bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+      </div>
+      <input name="telefone" id="ec-telefone" placeholder="Telefone" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <label class="block text-sm text-slate-600">Nível de Apoio (1–5)</label>
+      <input type="range" name="nivel_apoio" id="ec-nivel" min="1" max="5" class="w-full" />
+      <textarea name="notas" id="ec-notas" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2.5"></textarea>
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Alterações</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function openEditarContato(c) {
+    document.getElementById('form-editar-contato').action = '/contatos/' + c.id + '/editar';
+    document.getElementById('ec-nome').value = c.nome_completo || '';
+    document.getElementById('ec-cargo').value = c.cargo || '';
+    document.getElementById('ec-bairro').value = c.bairro || '';
+    document.getElementById('ec-telefone').value = c.telefone || '';
+    document.getElementById('ec-nivel').value = c.nivel_apoio || 3;
+    document.getElementById('ec-notas').value = c.notas || '';
+    openModal('modal-editar-contato');
+  }
+</script>
+{% endblock %}

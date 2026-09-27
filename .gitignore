@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Database
+*.db
+*.sqlite3
+
+# App uploads / generated
+app/static/uploads/
+*.pdf
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Test artifacts
+.pytest_cache/
+test-results/

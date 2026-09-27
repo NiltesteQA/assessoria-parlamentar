@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ titulo }} · Assessoria Parlamentar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f4f8', 100: '#d9e2ec', 500: '#334e68',
+              600: '#243b53', 700: '#1c3049', 800: '#102a43', 900: '#0b1f33',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen antialiased">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar (desktop) -->
+    <aside class="hidden md:flex md:flex-col md:w-64 bg-brand-800 text-slate-100 fixed inset-y-0 left-0 z-20">
+      <div class="px-6 py-5 border-b border-white/10">
+        <div class="text-lg font-bold leading-tight">Assessoria</div>
+        <div class="text-xs text-slate-300">Gestão &amp; Prestação de Contas</div>
+      </div>
+      <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+        {% set nav = [
+          ('dashboard', '/', 'Dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'),
+          ('contatos', '/contatos', 'Contatos / Redes', 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4z'),
+          ('demandas', '/demandas', 'Demandas', 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'),
+          ('oficios', '/oficios', 'Ofícios', 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'),
+          ('relatorio', '/relatorio', 'Relatório Trimestral', 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'),
+        ] %}
+        {% for key, href, label, icon in nav %}
+        <a href="{{ href }}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition {{ 'bg-white/15 font-semibold' if active == key else 'hover:bg-white/10' }}">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="{{ icon }}" />
+          </svg>
+          <span>{{ label }}</span>
+        </a>
+        {% endfor %}
+      </nav>
+      <div class="px-6 py-4 text-xs text-slate-400 border-t border-white/10">
+        © {{ ano_atual }} · v1.0
+      </div>
+    </aside>
+
+    <!-- Conteúdo -->
+    <div class="flex-1 md:ml-64 flex flex-col">
+      <!-- Topbar (mobile) -->
+      <header class="md:hidden sticky top-0 z-10 bg-brand-800 text-white px-4 py-3 flex items-center justify-between shadow">
+        <div class="font-bold">Assessoria</div>
+        <div class="text-xs text-slate-300">{{ titulo }}</div>
+      </header>
+
+      <main class="flex-1 p-4 md:p-8 pb-28 md:pb-8 max-w-7xl w-full mx-auto">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-20 bg-white border-t border-slate-200 grid grid-cols-4 text-[11px]">
+    {% set mnav = [
+      ('dashboard', '/', 'Início'),
+      ('contatos', '/contatos', 'Contatos'),
+      ('demandas', '/demandas', 'Demandas'),
+      ('oficios', '/oficios', 'Ofícios'),
+    ] %}
+    {% for key, href, label in mnav %}
+    <a href="{{ href }}" class="flex flex-col items-center py-2 {{ 'text-brand-700 font-semibold' if active == key else 'text-slate-500' }}">
+      <span>{{ label }}</span>
+    </a>
+    {% endfor %}
+  </nav>
+
+  {% include 'partials/registro_rapido.html' %}
+
+  <!-- Toast de sucesso -->
+  <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+    <div class="flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span id="toast-msg">Registro salvo com sucesso!</span>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

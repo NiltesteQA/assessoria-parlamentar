@@ -1,0 +1,22 @@
+/* Estilos complementares ao Tailwind (CDN) */
+
+html { scroll-behavior: smooth; }
+
+/* Ajuste fino de inputs para toque no mobile */
+input, select, textarea {
+  font-size: 16px; /* evita zoom automático no iOS */
+}
+
+/* Animação do toast */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#toast:not(.hidden) > div { animation: toast-in .2s ease-out; }
+
+/* Modal */
+.modal-backdrop { backdrop-filter: blur(2px); }
+
+/* Scrollbar discreta em tabelas */
+.table-scroll::-webkit-scrollbar { height: 8px; }
+.table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }

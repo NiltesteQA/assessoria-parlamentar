@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<style>
+  @page {
+    size: A4;
+    margin: 1.6cm 1.8cm;
+    @bottom-center {
+      content: "Relatório gerado em {{ gerado_em }} · página " counter(page) " de " counter(pages);
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    margin: 0;
+  }
+  .header {
+    border-bottom: 3px solid #243b53;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+  }
+  .header .eyebrow {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+  }
+  .header .mandato { font-size: 18pt; font-weight: bold; color: #102a43; margin: 2px 0; }
+  .header .sub { font-size: 10pt; color: #475569; }
+
+  h2.section {
+    font-size: 11pt;
+    color: #243b53;
+    border-left: 4px solid #334e68;
+    padding-left: 8px;
+    margin: 20px 0 8px;
+  }
+
+  .metrics { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  .metrics td {
+    width: 25%;
+    text-align: center;
+    background: #f1f5f9;
+    border: 3px solid #ffffff;
+    padding: 12px 6px;
+    border-radius: 6px;
+  }
+  .metrics .num { font-size: 20pt; font-weight: bold; color: #102a43; }
+  .metrics .num.green { color: #059669; }
+  .metrics .lbl { font-size: 8pt; color: #64748b; text-transform: uppercase; }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.data th {
+    text-align: left;
+    background: #243b53;
+    color: #fff;
+    padding: 6px 8px;
+    font-weight: 600;
+    font-size: 9pt;
+  }
+  table.data td { padding: 5px 8px; border-bottom: 1px solid #e2e8f0; }
+  table.data tr:nth-child(even) td { background: #f8fafc; }
+
+  .badge {
+    display: inline-block;
+    font-size: 8pt;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    color: #334155;
+  }
+  .chips { margin-top: 4px; }
+  .chip {
+    display: inline-block;
+    background: #d9e2ec;
+    color: #243b53;
+    font-size: 9pt;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin: 0 4px 4px 0;
+  }
+  .obs {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 12px;
+    min-height: 60px;
+    white-space: pre-wrap;
+    background: #fdfdfd;
+    font-size: 10pt;
+  }
+  .muted { color: #94a3b8; font-style: italic; }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="eyebrow">Relatório de Prestação de Contas Trimestral</div>
+    <div class="mandato">{{ config.nome_mandato }}</div>
+    <div class="sub">{{ config.nome_assessor }} &nbsp;·&nbsp; {{ rotulo }}</div>
+  </div>
+
+  <h2 class="section">Resumo de Performance</h2>
+  <table class="metrics">
+    <tr>
+      <td>
+        <div class="num">{{ metricas.total_demandas }}</div>
+        <div class="lbl">Atendimentos</div>
+      </td>
+      <td>
+        <div class="num green">{{ metricas.taxa_resolucao }}%</div>
+        <div class="lbl">Taxa de Resolução</div>
+      </td>
+      <td>
+        <div class="num">{{ metricas.total_oficios }}</div>
+        <div class="lbl">Ofícios Enviados</div>
+      </td>
+      <td>
+        <div class="num">{{ metricas.novos_contatos }}</div>
+        <div class="lbl">Novos Contatos</div>
+      </td>
+    </tr>
+  </table>
+  <p style="font-size:9pt;color:#64748b;margin-top:2px;">
+    {{ metricas.demandas_concluidas }} demanda(s) concluída(s) ·
+    {{ metricas.oficios_respondidos }} ofício(s) respondido(s) ·
+    impacto estimado de {{ "{:,}".format(metricas.impacto_total).replace(",", ".") }} pessoas/famílias.
+  </p>
+
+  <h2 class="section">Destaques — Principais Demandas</h2>
+  {% if destaques.demandas %}
+  <table class="data">
+    <thead><tr><th>Código</th><th>Categoria</th><th>Bairro</th><th>Descrição</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for d in destaques.demandas %}
+      <tr>
+        <td>{{ d.codigo }}</td>
+        <td>{{ d.categoria }}</td>
+        <td>{{ d.bairro or '—' }}</td>
+        <td>{{ (d.descricao or '')[:70] }}</td>
+        <td><span class="badge">{{ d.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">Sem demandas registradas no período.</p>{% endif %}
+
+  <h2 class="section">Destaques — Principais Ofícios</h2>
+  {% if destaques.oficios %}
+  <table class="data">
+    <thead><tr><th>Número</th><th>Órgão / Destinatário</th><th>Assunto</th><th>Impacto</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for o in destaques.oficios %}
+      <tr>
+        <td>{{ o.numero }}</td>
+        <td>{{ o.orgao_destinatario or '—' }}</td>
+        <td>{{ (o.assunto or '')[:50] }}</td>
+        <td>{{ o.impacto_estimado or 0 }}</td>
+        <td><span class="badge">{{ o.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">Sem ofícios registrados no período.</p>{% endif %}
+
+  <h2 class="section">Mapeamento Regional — Bairros Beneficiados</h2>
+  {% if metricas.top_bairros %}
+  <div class="chips">
+    {% for bairro, qtd in metricas.top_bairros %}
+    <span class="chip">{{ bairro }} — {{ qtd }} demanda(s)</span>
+    {% endfor %}
+  </div>
+  {% else %}<p class="muted">Sem dados regionais no período.</p>{% endif %}
+
+  <h2 class="section">Observações e Próximos Passos</h2>
+  <div class="obs">{% if observacoes %}{{ observacoes }}{% else %}<span class="muted">—</span>{% endif %}</div>
+
+</body>
+</html>

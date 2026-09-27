@@ -1,0 +1,112 @@
+<!-- Botão flutuante de Registro Rápido (mobile-first, também visível no desktop) -->
+<div class="fixed right-5 bottom-20 md:bottom-6 z-30">
+  <!-- Menu de opções -->
+  <div id="fab-menu" class="hidden flex flex-col items-end gap-2 mb-3">
+    <button onclick="toggleFab(); openModal('modal-rapido-contato')"
+            class="flex items-center gap-2 bg-white text-brand-800 px-4 py-2.5 rounded-full shadow-lg text-sm font-medium hover:bg-slate-50">
+      <span>Novo Contato</span>
+      <span class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center">👤</span>
+    </button>
+    <button onclick="toggleFab(); openModal('modal-rapido-demanda')"
+            class="flex items-center gap-2 bg-white text-brand-800 px-4 py-2.5 rounded-full shadow-lg text-sm font-medium hover:bg-slate-50">
+      <span>Nova Demanda</span>
+      <span class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center">📋</span>
+    </button>
+    <button onclick="toggleFab(); openModal('modal-rapido-oficio')"
+            class="flex items-center gap-2 bg-white text-brand-800 px-4 py-2.5 rounded-full shadow-lg text-sm font-medium hover:bg-slate-50">
+      <span>Novo Ofício</span>
+      <span class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center">📄</span>
+    </button>
+  </div>
+
+  <!-- Botão principal -->
+  <button onclick="toggleFab()" aria-label="Registro Rápido"
+          class="w-14 h-14 rounded-full bg-brand-700 text-white shadow-xl flex items-center justify-center hover:bg-brand-800 active:scale-95 transition">
+    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+  </button>
+</div>
+
+<!-- Modal: Novo Contato rápido -->
+<div id="modal-rapido-contato" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">👤 Novo Contato</h3>
+      <button onclick="closeModal('modal-rapido-contato')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" action="/contatos/novo" class="space-y-3">
+      <input name="nome_completo" required placeholder="Nome completo *"
+             class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <select name="cargo" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          <option value="Presidente de Bairro">Pres. de Bairro</option>
+          <option value="Comerciante">Comerciante</option>
+          <option value="Líder Comunitário">Líder Comunitário</option>
+          <option value="Eleitor" selected>Eleitor</option>
+          <option value="Apoiador">Apoiador</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <input name="bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+      </div>
+      <input name="telefone" placeholder="Telefone / WhatsApp" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <label class="block text-sm text-slate-600">Nível de Apoio (1–5)</label>
+      <input type="range" name="nivel_apoio" min="1" max="5" value="3" class="w-full" />
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Contato</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Nova Demanda rápida -->
+<div id="modal-rapido-demanda" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">📋 Nova Demanda</h3>
+      <button onclick="closeModal('modal-rapido-demanda')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" action="/demandas/novo" enctype="multipart/form-data" class="space-y-3">
+      <input name="solicitante_nome" placeholder="Solicitante" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <input name="bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+        <select name="categoria" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          <option>Saúde</option><option>Obras / Tapa-buraco</option><option>Iluminação</option>
+          <option>Educação</option><option>Segurança</option><option>Transporte</option>
+          <option selected>Outros</option>
+        </select>
+      </div>
+      <textarea name="descricao" rows="3" placeholder="Descrição da demanda"
+                class="w-full rounded-lg border border-slate-300 px-3 py-2.5"></textarea>
+      <select name="status" class="w-full rounded-lg border border-slate-300 px-3 py-2.5">
+        <option selected>Pendente</option><option>Em Andamento</option><option>Concluído</option><option>Cancelado</option>
+      </select>
+      <label class="block text-sm text-slate-600">Anexo (foto/documento)</label>
+      <input type="file" name="anexo" class="w-full text-sm" />
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Demanda</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Novo Ofício rápido -->
+<div id="modal-rapido-oficio" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">📄 Novo Ofício</h3>
+      <button onclick="closeModal('modal-rapido-oficio')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" action="/oficios/novo" enctype="multipart/form-data" class="space-y-3">
+      <input name="orgao_destinatario" placeholder="Órgão / Destinatário" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <input name="assunto" placeholder="Assunto / Pauta" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <select name="status" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          <option selected>Enviado</option><option>Aguardando Resposta</option>
+          <option>Respondido / Atendido</option><option>Arquivado</option>
+        </select>
+        <input name="impacto_estimado" type="number" min="0" placeholder="Impacto (pessoas)" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+      </div>
+      <input name="numero_protocolo" placeholder="Nº do Protocolo" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <label class="block text-sm text-slate-600">Anexo (PDF do ofício/resposta)</label>
+      <input type="file" name="anexo" class="w-full text-sm" />
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Ofício</button>
+    </form>
+  </div>
+</div>

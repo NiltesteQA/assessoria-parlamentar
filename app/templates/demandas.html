@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+  <div>
+    <h1 class="text-2xl font-bold text-brand-800">Atendimentos e Demandas</h1>
+    <p class="text-sm text-slate-500">{{ demandas|length }} demanda(s)</p>
+  </div>
+  <button onclick="openModal('modal-nova-demanda')"
+          class="bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-brand-800">
+    + Nova Demanda
+  </button>
+</div>
+
+<!-- Filtros -->
+<form method="get" action="/demandas" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-4">
+  <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <input name="q" value="{{ filtros.q }}" placeholder="Buscar…"
+           class="rounded-lg border border-slate-300 px-3 py-2 text-sm lg:col-span-2" />
+    <select name="status" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      <option value="">Todos status</option>
+      {% for s in status_opcoes %}<option value="{{ s }}" {{ 'selected' if s == filtros.status }}>{{ s }}</option>{% endfor %}
+    </select>
+    <select name="categoria" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      <option value="">Todas categorias</option>
+      {% for c in categorias %}<option value="{{ c }}" {{ 'selected' if c == filtros.categoria }}>{{ c }}</option>{% endfor %}
+    </select>
+    <input name="data_ini" type="date" value="{{ filtros.data_ini }}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+    <input name="data_fim" type="date" value="{{ filtros.data_fim }}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+  </div>
+  <div class="flex flex-wrap gap-2 mt-3">
+    <button class="bg-slate-800 text-white text-sm px-4 py-2 rounded-lg">Filtrar</button>
+    <a href="/demandas" class="text-sm px-4 py-2 rounded-lg border border-slate-300">Limpar</a>
+    <div class="flex-1"></div>
+    <a href="/demandas/exportar/csv?q={{ filtros.q }}&status={{ filtros.status }}&categoria={{ filtros.categoria }}&data_ini={{ filtros.data_ini }}&data_fim={{ filtros.data_fim }}"
+       class="text-sm px-4 py-2 rounded-lg border border-emerald-600 text-emerald-700 hover:bg-emerald-50">Exportar CSV</a>
+    <a href="/demandas/exportar/excel?q={{ filtros.q }}&status={{ filtros.status }}&categoria={{ filtros.categoria }}&data_ini={{ filtros.data_ini }}&data_fim={{ filtros.data_fim }}"
+       class="text-sm px-4 py-2 rounded-lg border border-emerald-600 text-emerald-700 hover:bg-emerald-50">Exportar Excel</a>
+  </div>
+</form>
+
+<!-- Tabela -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+  <div class="overflow-x-auto table-scroll">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="px-4 py-3 font-medium">Código</th>
+          <th class="px-4 py-3 font-medium">Data</th>
+          <th class="px-4 py-3 font-medium">Solicitante</th>
+          <th class="px-4 py-3 font-medium">Bairro</th>
+          <th class="px-4 py-3 font-medium">Categoria</th>
+          <th class="px-4 py-3 font-medium">Status</th>
+          <th class="px-4 py-3 font-medium text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for d in demandas %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-4 py-3 font-mono text-xs text-brand-700">{{ d.codigo }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ d.data_entrada | fmt_data }}</td>
+          <td class="px-4 py-3 text-slate-800">{{ (d.solicitante.nome_completo if d.solicitante else d.solicitante_nome) or '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ d.bairro or '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ d.categoria }}</td>
+          <td class="px-4 py-3"><span class="text-xs px-2 py-1 rounded-full {{ d.status | badge_status }}">{{ d.status }}</span></td>
+          <td class="px-4 py-3 text-right whitespace-nowrap">
+            {% if d.anexo %}<a href="{{ d.anexo }}" target="_blank" class="text-slate-500 hover:underline mr-2">Anexo</a>{% endif %}
+            <button onclick='openEditarDemanda({{ d.to_dict() | tojson }})' class="text-brand-600 hover:underline">Editar</button>
+            <form method="post" action="/demandas/{{ d.id }}/excluir" class="inline" onsubmit="return confirm('Excluir esta demanda?')">
+              <button class="text-rose-600 hover:underline ml-2">Excluir</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="px-4 py-10 text-center text-slate-400">Nenhuma demanda encontrada.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Nova Demanda -->
+<div id="modal-nova-demanda" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">Nova Demanda <span class="text-sm font-normal text-slate-400">({{ proximo_codigo }})</span></h3>
+      <button onclick="closeModal('modal-nova-demanda')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" action="/demandas/novo" enctype="multipart/form-data" class="space-y-3">
+      <select name="solicitante_id" class="w-full rounded-lg border border-slate-300 px-3 py-2.5">
+        <option value="">— Vincular a um contato (opcional) —</option>
+        {% for c in contatos %}<option value="{{ c.id }}">{{ c.nome_completo }}{% if c.bairro %} · {{ c.bairro }}{% endif %}</option>{% endfor %}
+      </select>
+      <input name="solicitante_nome" placeholder="Ou nome do solicitante (texto livre)" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <input name="bairro" placeholder="Bairro / Região" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+        <select name="categoria" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          {% for c in categorias %}<option>{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <textarea name="descricao" rows="3" placeholder="Descrição da demanda" class="w-full rounded-lg border border-slate-300 px-3 py-2.5"></textarea>
+      <div class="grid grid-cols-2 gap-3">
+        <select name="status" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          {% for s in status_opcoes %}<option>{{ s }}</option>{% endfor %}
+        </select>
+        <input name="data_entrada" type="date" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+      </div>
+      <label class="block text-sm text-slate-600">Anexo (foto/documento)</label>
+      <input type="file" name="anexo" class="w-full text-sm" />
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Demanda</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Editar Demanda -->
+<div id="modal-editar-demanda" data-modal class="hidden fixed inset-0 z-40 items-end sm:items-center justify-center bg-black/40 modal-backdrop p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-xl p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-brand-800">Editar Demanda</h3>
+      <button onclick="closeModal('modal-editar-demanda')" class="text-slate-400 text-2xl leading-none">&times;</button>
+    </div>
+    <form method="post" id="form-editar-demanda" class="space-y-3">
+      <input name="solicitante_nome" id="ed-solic" placeholder="Solicitante" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="grid grid-cols-2 gap-3">
+        <input name="bairro" id="ed-bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+        <select name="categoria" id="ed-categoria" class="rounded-lg border border-slate-300 px-3 py-2.5">
+          {% for c in categorias %}<option>{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <textarea name="descricao" id="ed-descricao" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2.5"></textarea>
+      <select name="status" id="ed-status" class="w-full rounded-lg border border-slate-300 px-3 py-2.5">
+        {% for s in status_opcoes %}<option>{{ s }}</option>{% endfor %}
+      </select>
+      <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Alterações</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function openEditarDemanda(d) {
+    document.getElementById('form-editar-demanda').action = '/demandas/' + d.id + '/editar';
+    document.getElementById('ed-solic').value = d.solicitante_nome || '';
+    document.getElementById('ed-bairro').value = d.bairro || '';
+    document.getElementById('ed-categoria').value = d.categoria || 'Outros';
+    document.getElementById('ed-descricao').value = d.descricao || '';
+    document.getElementById('ed-status').value = d.status || 'Pendente';
+    openModal('modal-editar-demanda');
+  }
+</script>
+{% endblock %}
