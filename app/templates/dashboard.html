@@ -19,7 +19,7 @@
       {% for t in trimestres %}
       <a href="/?ano={{ ano }}&trimestre={{ t }}"
          class="px-3 py-2 text-sm font-medium {{ 'bg-brand-700 text-white' if t == trimestre else 'text-slate-600 hover:bg-slate-100' }}">
-        {{ t }}
+        {{ t | rotulo_tri }}
       </a>
       {% endfor %}
     </div>

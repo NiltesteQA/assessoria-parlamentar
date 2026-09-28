@@ -19,7 +19,7 @@
         <div class="grid grid-cols-4 gap-2">
           {% for t in trimestres %}
           <a href="/relatorio?ano={{ ano }}&trimestre={{ t }}"
-             class="text-center py-2 rounded-lg text-sm font-medium {{ 'bg-brand-700 text-white' if t == trimestre else 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">{{ t }}</a>
+             class="text-center py-2 rounded-lg text-sm font-medium {{ 'bg-brand-700 text-white' if t == trimestre else 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">{{ t | rotulo_tri }}</a>
           {% endfor %}
         </div>
       </form>

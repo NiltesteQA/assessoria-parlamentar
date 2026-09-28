@@ -85,3 +85,16 @@ def test_contatos_usa_rotulo_perfil(page, base_url):
     assert page.get_by_role("option", name="Todos os perfis").count() == 1
     # a palavra "Cargo" não deve mais aparecer como cabeçalho de coluna
     assert page.get_by_role("columnheader", name="Cargo").count() == 0
+
+
+
+def test_botoes_trimestre_em_portugues(page, base_url):
+    """Os botões de trimestre devem exibir '1º Tri'..'4º Tri' (sem a sigla Q)."""
+    page.goto(f"{base_url}/?ano=2026&trimestre=Q3")
+    for rotulo in ["1º Tri", "2º Tri", "3º Tri", "4º Tri"]:
+        assert page.get_by_role("link", name=rotulo).first.is_visible()
+    # a sigla antiga não deve mais aparecer como texto de botão
+    assert page.get_by_role("link", name="Q1").count() == 0
+    # o filtro deve continuar funcionando: clicar em "1º Tri" leva a trimestre=Q1
+    page.get_by_role("link", name="1º Tri").first.click()
+    assert "trimestre=Q1" in page.url

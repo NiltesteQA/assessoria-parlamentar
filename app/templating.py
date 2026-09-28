@@ -16,6 +16,12 @@ def _fmt_data(valor):
     return str(valor)
 
 
+def _rotulo_tri(t: str) -> str:
+    """Converte a sigla técnica do trimestre (Q1..Q4) no rótulo exibido ao usuário."""
+    mapa = {"Q1": "1º Tri", "Q2": "2º Tri", "Q3": "3º Tri", "Q4": "4º Tri"}
+    return mapa.get(str(t).upper(), str(t))
+
+
 def _badge_status(status: str) -> str:
     """Retorna classes Tailwind para o badge de status."""
     mapa = {
@@ -33,4 +39,5 @@ def _badge_status(status: str) -> str:
 
 templates.env.filters["fmt_data"] = _fmt_data
 templates.env.filters["badge_status"] = _badge_status
+templates.env.filters["rotulo_tri"] = _rotulo_tri
 templates.env.globals["ano_atual"] = date.today().year
