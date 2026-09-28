@@ -98,3 +98,12 @@ def test_botoes_trimestre_em_portugues(page, base_url):
     # o filtro deve continuar funcionando: clicar em "1º Tri" leva a trimestre=Q1
     page.get_by_role("link", name="1º Tri").first.click()
     assert "trimestre=Q1" in page.url
+
+
+
+def test_relatorio_rotulo_nome_vereador(page, base_url):
+    """O campo do cabeçalho deve exibir 'Nome do Vereador'."""
+    page.goto(f"{base_url}/relatorio?ano=2026&trimestre=Q3")
+    assert page.get_by_text("Nome do Vereador").is_visible()
+    # o rótulo antigo não deve mais aparecer
+    assert page.get_by_text("Nome / Logotipo do Mandato").count() == 0
