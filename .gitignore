@@ -12,6 +12,9 @@ venv/
 # App uploads / generated
 app/static/uploads/
 *.pdf
+# ...mas versionamos a documentação em docs/
+!docs/
+!docs/*.pdf
 
 # OS / editor
 .DS_Store
