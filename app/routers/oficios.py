@@ -26,6 +26,7 @@ def _filtrar(db, q, status, orgao, data_ini, data_fim):
                 Oficio.numero.ilike(like),
                 Oficio.orgao_destinatario.ilike(like),
                 Oficio.numero_protocolo.ilike(like),
+                Oficio.municipe_solicitante.ilike(like),
             )
         )
     if status:
@@ -79,6 +80,10 @@ def criar(
     status: str = Form("Enviado"),
     numero_protocolo: str = Form(""),
     impacto_estimado: int = Form(0),
+    municipe_solicitante: str = Form(""),
+    rua: str = Form(""),
+    bairro: str = Form(""),
+    cep: str = Form(""),
     data_envio: str = Form(""),
     numero: str = Form(""),
     anexo: UploadFile = File(None),
@@ -99,6 +104,10 @@ def criar(
         status=status,
         numero_protocolo=numero_protocolo.strip(),
         impacto_estimado=int(impacto_estimado or 0),
+        municipe_solicitante=municipe_solicitante.strip(),
+        rua=rua.strip(),
+        bairro=bairro.strip(),
+        cep=cep.strip(),
         anexo=salvar_upload(anexo, "oficios"),
     )
     db.add(oficio)
@@ -114,6 +123,10 @@ def editar(
     status: str = Form("Enviado"),
     numero_protocolo: str = Form(""),
     impacto_estimado: int = Form(0),
+    municipe_solicitante: str = Form(""),
+    rua: str = Form(""),
+    bairro: str = Form(""),
+    cep: str = Form(""),
     db: Session = Depends(get_db),
 ):
     o = db.get(Oficio, oficio_id)
@@ -123,6 +136,10 @@ def editar(
         o.status = status
         o.numero_protocolo = numero_protocolo.strip()
         o.impacto_estimado = int(impacto_estimado or 0)
+        o.municipe_solicitante = municipe_solicitante.strip()
+        o.rua = rua.strip()
+        o.bairro = bairro.strip()
+        o.cep = cep.strip()
         db.commit()
     return RedirectResponse(url="/oficios?ok=1", status_code=303)
 
@@ -157,6 +174,10 @@ def _dataframe(db, **filtros) -> pd.DataFrame:
                 "Status": o.status,
                 "Protocolo": o.numero_protocolo,
                 "Impacto Estimado": o.impacto_estimado,
+                "Munícipe Solicitante": o.municipe_solicitante,
+                "Rua": o.rua,
+                "Bairro": o.bairro,
+                "CEP": o.cep,
             }
             for o in oficios
         ]

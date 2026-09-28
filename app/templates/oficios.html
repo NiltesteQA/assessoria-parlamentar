@@ -95,6 +95,15 @@
         <input name="numero_protocolo" placeholder="Nº do Protocolo" class="rounded-lg border border-slate-300 px-3 py-2.5" />
         <input name="impacto_estimado" type="number" min="0" placeholder="Impacto (pessoas)" class="rounded-lg border border-slate-300 px-3 py-2.5" />
       </div>
+      <div class="border-t border-slate-100 pt-3 mt-1">
+        <p class="text-xs font-semibold text-slate-500 mb-2">Munícipe solicitante e local da melhoria (opcional)</p>
+        <input name="municipe_solicitante" placeholder="Nome do munícipe solicitante" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 mb-3" />
+        <input name="rua" placeholder="Rua / Logradouro" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 mb-3" />
+        <div class="grid grid-cols-2 gap-3">
+          <input name="bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+          <input name="cep" placeholder="CEP" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+        </div>
+      </div>
       <label class="block text-sm text-slate-600">Anexo (PDF do ofício/resposta)</label>
       <input type="file" name="anexo" class="w-full text-sm" />
       <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Ofício</button>
@@ -119,6 +128,15 @@
         <input name="impacto_estimado" id="eo-impacto" type="number" min="0" class="rounded-lg border border-slate-300 px-3 py-2.5" />
       </div>
       <input name="numero_protocolo" id="eo-protocolo" placeholder="Nº do Protocolo" class="w-full rounded-lg border border-slate-300 px-3 py-2.5" />
+      <div class="border-t border-slate-100 pt-3 mt-1">
+        <p class="text-xs font-semibold text-slate-500 mb-2">Munícipe solicitante e local da melhoria (opcional)</p>
+        <input name="municipe_solicitante" id="eo-municipe" placeholder="Nome do munícipe solicitante" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 mb-3" />
+        <input name="rua" id="eo-rua" placeholder="Rua / Logradouro" class="w-full rounded-lg border border-slate-300 px-3 py-2.5 mb-3" />
+        <div class="grid grid-cols-2 gap-3">
+          <input name="bairro" id="eo-bairro" placeholder="Bairro" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+          <input name="cep" id="eo-cep" placeholder="CEP" class="rounded-lg border border-slate-300 px-3 py-2.5" />
+        </div>
+      </div>
       <button class="w-full bg-brand-700 text-white font-semibold py-3 rounded-lg hover:bg-brand-800">Salvar Alterações</button>
     </form>
   </div>
@@ -135,6 +153,10 @@
     document.getElementById('eo-status').value = o.status || 'Enviado';
     document.getElementById('eo-impacto').value = o.impacto_estimado || 0;
     document.getElementById('eo-protocolo').value = o.numero_protocolo || '';
+    document.getElementById('eo-municipe').value = o.municipe_solicitante || '';
+    document.getElementById('eo-rua').value = o.rua || '';
+    document.getElementById('eo-bairro').value = o.bairro || '';
+    document.getElementById('eo-cep').value = o.cep || '';
     openModal('modal-editar-oficio');
   }
 </script>

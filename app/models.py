@@ -128,6 +128,11 @@ class Oficio(Base):
     status = Column(String(40), default="Enviado")
     numero_protocolo = Column(String(80), default="")
     impacto_estimado = Column(Integer, default=0)  # nº de pessoas/famílias
+    # Solicitante / localização da demanda que originou o ofício
+    municipe_solicitante = Column(String(200), default="")
+    rua = Column(String(200), default="")
+    bairro = Column(String(120), default="")
+    cep = Column(String(20), default="")
     anexo = Column(String(300), default="")
 
     def to_dict(self):
@@ -140,6 +145,10 @@ class Oficio(Base):
             "status": self.status,
             "numero_protocolo": self.numero_protocolo,
             "impacto_estimado": self.impacto_estimado,
+            "municipe_solicitante": self.municipe_solicitante,
+            "rua": self.rua,
+            "bairro": self.bairro,
+            "cep": self.cep,
             "anexo": self.anexo,
         }
 

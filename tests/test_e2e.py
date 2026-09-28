@@ -107,3 +107,21 @@ def test_relatorio_rotulo_nome_vereador(page, base_url):
     assert page.get_by_text("Nome do Vereador").is_visible()
     # o rótulo antigo não deve mais aparecer
     assert page.get_by_text("Nome / Logotipo do Mandato").count() == 0
+
+
+
+def test_oficio_campos_municipe_e_local(page, base_url):
+    """Novo Ofício deve aceitar munícipe solicitante, rua, bairro e CEP."""
+    page.goto(f"{base_url}/oficios")
+    page.get_by_role("button", name="+ Novo Ofício").click()
+    modal = page.locator("#modal-novo-oficio")
+    modal.get_by_placeholder("Órgão / Destinatário").fill("Secretaria de Obras")
+    modal.get_by_placeholder("Assunto / Pauta").fill("Tapa-buraco solicitado")
+    modal.get_by_placeholder("Nome do munícipe solicitante").fill("Dona Cleide")
+    modal.get_by_placeholder("Rua / Logradouro").fill("Rua das Acácias, 100")
+    modal.get_by_placeholder("Bairro").fill("Vila Nova")
+    modal.get_by_placeholder("CEP").fill("06400-000")
+    modal.get_by_role("button", name="Salvar Ofício").click()
+    # busca pelo nome do munícipe (o filtro agora cobre esse campo)
+    page.goto(f"{base_url}/oficios?q=Cleide")
+    assert page.get_by_text("Secretaria de Obras").first.is_visible()
