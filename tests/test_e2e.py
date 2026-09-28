@@ -66,3 +66,22 @@ def test_pdf_endpoint_direto(base_url):
     assert r.status_code == 200
     assert r.headers["content-type"] == "application/pdf"
     assert r.content[:5] == b"%PDF-"
+
+
+
+def test_marca_assessoria_aguia(page, base_url):
+    """A identidade visual deve exibir 'Assessoria Águia' na navegação."""
+    page.goto(f"{base_url}/")
+    # aparece na sidebar (desktop) — pelo menos uma ocorrência visível
+    assert page.get_by_text("Assessoria Águia").first.is_visible()
+
+
+def test_contatos_usa_rotulo_perfil(page, base_url):
+    """A tela de Contatos deve usar 'Perfil' no lugar de 'Cargo'."""
+    page.goto(f"{base_url}/contatos")
+    # cabeçalho da coluna
+    assert page.get_by_role("columnheader", name="Perfil").is_visible()
+    # opção do filtro (dentro de um <select>, então checamos presença no DOM)
+    assert page.get_by_role("option", name="Todos os perfis").count() == 1
+    # a palavra "Cargo" não deve mais aparecer como cabeçalho de coluna
+    assert page.get_by_role("columnheader", name="Cargo").count() == 0

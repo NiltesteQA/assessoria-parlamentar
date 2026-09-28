@@ -24,7 +24,7 @@
       {% for b in bairros %}<option value="{{ b }}" {{ 'selected' if b == filtros.bairro }}>{{ b }}</option>{% endfor %}
     </select>
     <select name="cargo" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-      <option value="">Todos os cargos</option>
+      <option value="">Todos os perfis</option>
       {% for c in cargos %}<option value="{{ c }}" {{ 'selected' if c == filtros.cargo }}>{{ c }}</option>{% endfor %}
     </select>
   </div>
@@ -46,7 +46,7 @@
       <thead class="bg-slate-50 text-slate-500 text-left">
         <tr>
           <th class="px-4 py-3 font-medium">Nome</th>
-          <th class="px-4 py-3 font-medium">Cargo</th>
+          <th class="px-4 py-3 font-medium">Perfil</th>
           <th class="px-4 py-3 font-medium">Bairro</th>
           <th class="px-4 py-3 font-medium">Telefone</th>
           <th class="px-4 py-3 font-medium">Apoio</th>
